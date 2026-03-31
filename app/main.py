@@ -1,25 +1,20 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from app.schemas import TaskCreate
+from app.service import list_tasks, create_task, complete_task
 
 app = FastAPI()
-
-tasks = []
-
-
-class TaskCreate(BaseModel):
-    title: str
 
 
 @app.get("/tasks")
 def get_tasks():
-    return tasks
+    return list_tasks()
 
 
 @app.post("/tasks", status_code=201)
-def create_task(task: TaskCreate):
-    new_task = {
-        "id": len(tasks) + 1,
-        "title": task.title
-    }
-    tasks.append(new_task)
-    return new_task
+def post_task(task: TaskCreate):
+    return create_task(task.title)
+
+
+@app.patch("/tasks/{task_id}")
+def patch_task(task_id: int):
+    return complete_task(task_id)
